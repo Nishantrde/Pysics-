@@ -1,13 +1,14 @@
 import pygame
 import sys
 import math
-import numpy as np
 
 # Initialize Pygame
 pygame.init()
 
 # Set up the display
 width, height = 720, 1280
+# width, height = 720, 780
+
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('Hollow Circle')
 
@@ -16,6 +17,18 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (25, 150, 255)
+
+
+# Circle parameters
+center = (width // 2, height // 2)
+radius = 200
+thickness = 2  # Adjust this to change the thickness of the circle
+
+# Set up the clock for FPS control
+clock = pygame.time.Clock()
+
+
+font = pygame.font.SysFont(None, 48)  # Default system font, size 48
 
 # Circle parameters
 center = (width // 2, height // 2)
@@ -35,9 +48,11 @@ line_font = pygame.font.SysFont(None, 30)  # Default system font, size 48
 # Setup OpenCV video writer
 fps = 30
 
-
 # Main loop
 running = True
+
+# x = center[0]
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -45,7 +60,6 @@ while running:
 
     # Clear the screen
     screen.fill(BLACK)
-
     # Draw the hollow circle
     pygame.draw.circle(screen, WHITE, center, radius, thickness)
 
@@ -99,7 +113,7 @@ while running:
 
     # Draw the radius
     pygame.draw.line(screen, RED, center, (end_x, end_y), 3)
-
+    
     # Draw the angle arc
     arc_radius = 50  # Adjust this for the arc's radius
     arc_rect = pygame.Rect(center[0] - arc_radius, center[1] - arc_radius, 2 * arc_radius, 2 * arc_radius)
@@ -110,15 +124,28 @@ while running:
                 center[1] - int(arc_radius * math.sin(angle_radians / 2)))
     screen.blit(angle_text, angle_pos)
 
-    
-    
+    # Instead of using a fixed center_y for the sine wave, adjust it based on end_y
+    previous_point = None
+    y = end_y
+    ar = angle_radians
+    ad = angle_degrees
+    for x in range(center[0], width):
+        ar = math.radians(ad)
+        y = center[1] - int(radius * math.sin(ar))
+        pygame.draw.circle(screen, (0, 255, 0), (x, y), 2.5)
+        ad += angle_speed
+        x += angle_speed
+        if ad >= 360 :
+            ad = 0
+        if x > width:
+            x = center[0]
+
     # Update the display
     pygame.display.flip()
 
-    # Control the frame rate (60 frames per second)
+    # Control the frame rate (30 frames per second)
     clock.tick(30)
 
-# Release the video writer and quit Pygame
-
+# Quit Pygame
 pygame.quit()
 sys.exit()
